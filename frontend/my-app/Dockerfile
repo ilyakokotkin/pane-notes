@@ -4,7 +4,7 @@ FROM node:14 as build
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the current directory contents into the container at /usr/src/app
+# Copy the current directory contents into the container 
 COPY package*.json ./
 
 # Install any needed packages specified in package.json
