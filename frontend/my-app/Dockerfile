@@ -4,17 +4,18 @@ FROM node:14 as build
 # Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy the current directory contents into the container at /usr/src/app
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
 # Install any needed packages specified in package.json
+RUN npm config set unsafe-perm true
 RUN npm install
 
 # Bundle the app source inside the Docker image
 COPY . .
 
 # Build the React application
-RUN npm run build
+RUN npm run build || cat /root/.npm/_logs/*-debug.log
 
 # Use Nginx to serve the React application
 FROM nginx:alpine
