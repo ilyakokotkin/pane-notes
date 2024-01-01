@@ -1,16 +1,16 @@
-// frontend/src/TextPane.js
 import React, { useState, useEffect } from 'react';
 
 function TextPane() {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState({ text: '', x: 0, y: 0 });
+  const backendUrl = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000'
 
   // Fetch notes from the backend when the component mounts
   useEffect(() => {
-    fetch(process.env.REACT_APP_BACKEND_URL + '/notes')
+    fetch(`${backendUrl}/notes`)
     .then(response => response.json())
       .then(data => setNotes(data));
-  }, []);
+  }, [backendUrl]);
 
   // Handle click to create a new note
   const handlePaneClick = (e) => {
@@ -22,18 +22,23 @@ function TextPane() {
   // Save the note to the backend
   const saveNote = () => {
     if (newNote.text.trim()) {
-      fetch('http://localhost:5000/notes', {
+      fetch(`${backendUrl}/notes`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(newNote),
-      }).then(() => {
+      })
+      .then(() => {
         setNotes([...notes, newNote]);
-        setNewNote({ text: '', x: 0, y: 0 }); // Reset newNote
+        setNewNote({ text: '', x: 0, y: 0 });
+      })
+      .catch(error => {
+        console.error('Error saving note:', error);
       });
     }
   };
+  
 
   return (
     <div onClick={handlePaneClick} style={{ position: 'relative', width: '100%', height: '100vh', cursor: 'text' }}>
