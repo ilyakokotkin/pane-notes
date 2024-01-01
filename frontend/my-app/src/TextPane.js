@@ -37,7 +37,7 @@ function TextPane() {
         console.error('Error saving note:', error);
       });
     }
-  };
+  }
   
 
   return (
