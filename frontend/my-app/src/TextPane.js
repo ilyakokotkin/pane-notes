@@ -9,7 +9,10 @@ function TextPane() {
   useEffect(() => {
     fetch(`${backendUrl}/notes`)
     .then(response => response.json())
-      .then(data => setNotes(data));
+      .then(data => setNotes(data))
+      .catch(error => {
+        console.error('Error fetching notes:', error);
+      });
   }, [backendUrl]);
 
   // Handle click to create a new note
@@ -21,7 +24,12 @@ function TextPane() {
 
   // Save the note to the backend
   const saveNote = () => {
-    if (newNote.text.trim()) {
+    const trimmedText = newNote.text.trim();
+    if (trimmedText) {
+      const optimisticNoteId = Date.now();
+      const optimisticNote = { ...newNote, id: optimisticNoteId };
+      setNotes(prevNotes => [...prevNotes, optimisticNote]);
+
       fetch(`${backendUrl}/notes`, {
         method: 'POST',
         headers: {
@@ -29,13 +37,22 @@ function TextPane() {
         },
         body: JSON.stringify(newNote),
       })
-      .then(() => {
-        setNotes([...notes, newNote]);
-        setNewNote({ text: '', x: 0, y: 0 });
+      .then( resposne => {
+        if (!response.ok) {
+          throw new Error('Network resposne was not ok');
+        }
+        return response.json();
+      })
+      .then(savedNote => {
+        setNotes(prevNotes = prevNotes.map(note => note.id === optimisticNoteId ? savedNote : note
+          ));
       })
       .catch(error => {
         console.error('Error saving note:', error);
+        setNotes(prevNotes => prevNotes.filter(note => note.id !== optimisticNoteId));
       });
+
+      setNewNote({ text: '', x: 0, y: 0});
     }
   };
   
