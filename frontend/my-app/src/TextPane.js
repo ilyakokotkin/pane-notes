@@ -37,14 +37,15 @@ function TextPane() {
         },
         body: JSON.stringify(newNote),
       })
-      .then( resposne => {
+      .then( response => {
         if (!response.ok) {
-          throw new Error('Network resposne was not ok');
+          throw new Error('Network response was not ok');
         }
         return response.json();
       })
       .then(savedNote => {
-        setNotes(prevNotes = prevNotes.map(note => note.id === optimisticNoteId ? savedNote : note
+        setNotes(prevNotes => prevNotes.map(note => 
+          note.id === optimisticNoteId ? savedNote : note
           ));
       })
       .catch(error => {
