@@ -5,8 +5,16 @@ const Note = require('./models/Note');
 const mongoose = require('mongoose')
 const mongoURI = process.env.MONGO_URI;
 
+// Initialize the express application
+const app = express();
+app.use(cors());
+app.use(express.json());
+
 // Conect to MongoDB
-mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(mongoURI, { 
+  useNewUrlParser: true, 
+  useUnifiedTopology: true 
+});
 
 const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
@@ -14,31 +22,27 @@ db.once('open', function() {
   console.log("Connected successfully to the database");
 });
 
-const app = express();
-app.use(cors());
-app.use(express.json());
-
 // API to retrieve notes
-app.get('/notes', (req, res) => {
-  Note.find({}, (err, notes) => {
-    if (err) {
-      res.status(500).send(err);
-    } else {
-      res.json(notes);
-    }
-  });
+app.get('/notes', async (req, res) => {
+  try {
+    const notes = await Note.find({});
+    res.json(notes);
+  } catch (err) {
+    res.status(500).send(err);
+  }
 });
+
 
 // API to add a new note
 app.post('/notes', (req, res) => {
   const newNote = new Note(req.body);
-  newNote.save((err) => {
-    if (err) {
+  newNote.save()
+    .then(savedNote => {
+      res.status(201).send(savedNote);
+    })
+    .catch(err => {
       res.status(500).send(err);
-    } else {
-      res.status(201).send(newNote);
-    }
-  });
+    });
 });
 
 
