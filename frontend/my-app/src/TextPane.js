@@ -8,12 +8,25 @@ function TextPane() {
   // Fetch notes from the backend when the component mounts
   useEffect(() => {
     fetch(`${backendUrl}/notes`)
-    .then(response => response.json())
-      .then(data => setNotes(data))
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (Array.isArray(data)) {
+          setNotes(data);
+        } else {
+          console.error('Data fetched is not an array:', data);
+          setNotes([]); 
+        }
+      })
       .catch(error => {
         console.error('Error fetching notes:', error);
       });
   }, [backendUrl]);
+  
 
   // Handle click to create a new note
   const handlePaneClick = (e) => {
