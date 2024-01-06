@@ -8,6 +8,9 @@ services:
       - "5000:5000"
     environment:
       - NODE_ENV=production
+      - MONGO_URI=mongodb://mongo:27017/paneNotes
+    depends_on:
+      - mongo
     networks:
       - app-network
 
@@ -18,12 +21,28 @@ services:
     ports:
       - "80:80"
     environment:
-      - REACT_APP_BACKEND_URL=http://backend:5000
+      - REACT_APP_BACKEND_URL=http://34.221.228.101:5000
     depends_on:
       - backend
+    networks:
+      - app-network
+
+  mongo:
+    image: mongo
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongoadmin 
+      - MONGO_INITDB_ROOT_PASSWORD=secret 
+    ports:
+      - "27017:27017"
     networks:
       - app-network
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  mongodb_data:
+    driver: local
