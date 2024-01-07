@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 function TextPane() {
   const [notes, setNotes] = useState([]);
   const [newNote, setNewNote] = useState({ text: '', x: 0, y: 0 });
-  const backendUrl = process.env.REACT_APP_BACKEND_URL 
+  const backendUrl = 'http://34.221.228.101:5000'
 
   // Fetch notes from the backend when the component mounts
   useEffect(() => {
